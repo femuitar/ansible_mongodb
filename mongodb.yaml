@@ -1,0 +1,34 @@
+---
+-
+  hosts: mongodb
+  tasks:
+    -
+      name: "Create mongodb-org-3.6 yum repo"
+      command: "touch /etc/yum.repos.d/mongodb-org-3.6.repo"
+    -
+      name: "Add mongo repository"
+      yum_repository:
+        name: "mongodb-org-3.6"
+        description: "yum repo mongo 3.6"
+        baseurl: https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/3.6/x86_64/
+        gpgcheck: 1
+        enabled: 1
+        gpgkey: https://www.mongodb.org/static/pgp/server-3.6.asc
+    -
+      name: Ensure group "mongod" exists
+      group:
+        name: mongod
+        state: present
+    -
+      name: Add the user 'mongod' and a primary group of 'mongod'
+      user:
+        name: mongod
+        group: mongod
+    -
+      name: "Install mongo org  version 3.6"
+      yum:
+        name: mongodb-org-3.6.6
+        state: latest
+    -
+      name: Make sure a service is running
+      systemd: state=started name=mongod
